@@ -15,7 +15,7 @@ source "amazon-ebs" "ubuntu" {
     filters = {
       name                = "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"
       root-device-type    = "ebs"
-      virtualization-type = "kkk"
+      virtualization-type = "hvm"
     }
     most_recent = true
     owners      = [""]
