@@ -8,10 +8,11 @@ packer {
 }
 
 source "amazon-ebs" "ubuntu" {
-  ami_name      = "packer-ubuntu-aws-{{timestamp}}"
+  ami_name      = "task3-packer-ubuntu-aws-{{timestamp}}"
   instance_type = "t3.micro"
   region        = "us-west-2"
   ami_regions   = ["us-west-2", "us-east-1", "eu-central-1"]
+
   source_ami_filter {
     filters = {
       name                = "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"
@@ -21,26 +22,37 @@ source "amazon-ebs" "ubuntu" {
     most_recent = true
     owners      = ["099720109477"]
   }
+
   ssh_username = "ubuntu"
+
   tags = {
-    "Name"        = "MyUbuntuImage"
-    "Environment" = "Production"
-    "OS_Version"  = "Ubuntu 22.04"
-    "Release"     = "Latest"
-    "Created-by"  = "Packer"
+    Name        = "MyUbuntuNewImage"
+    Environment = "Production"
+    OS_Version  = "Ubuntu 22.04"
+    Release     = "Latest"
+    Created-by  = "Packer"
   }
 }
+
 build {
-  sources = [
-    "source.amazon-ebs.ubuntu"
-  ]
+  sources = ["source.amazon-ebs.ubuntu"]
 
   provisioner "shell" {
     inline = [
       "echo Installing Updates",
       "sudo apt-get update",
-      "sudo apt-get upgrade -y",
-      "sudo apt-get install -y nginx"
+      "sudo apt-get upgrade -y"
+    ]
+  }
+
+  provisioner "file" {
+    source      = "assets"
+    destination = "/tmp/"
+  }
+
+  provisioner "shell" {
+    inline = [
+      "sudo sh /tmp/assets/setup-web.sh"
     ]
   }
 }
